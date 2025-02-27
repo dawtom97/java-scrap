@@ -53,8 +53,15 @@ public class ScrapService {
             List<WebElement> elements = this.getFromOnet();
             for (WebElement element : elements) {
                 WebElement h3Element = element.findElement(By.tagName("h3"));
+                String image = "";
                 String titleText = h3Element.getText();
                 String link = element.getAttribute("href");
+
+                try {
+                    WebElement imageElement = element.findElement(By.tagName("img"));
+                    image = imageElement.getAttribute("src");
+                } catch (Exception ignored) {}
+
 
                 if (titleText.toLowerCase().contains(query.toLowerCase())) {
                     results.add(titleText);
@@ -64,6 +71,7 @@ public class ScrapService {
                     model.setSource(driver.getCurrentUrl());
                     model.setLink(link);
                     model.setDate(LocalDateTime.now());
+                    model.setImage(image);
 
                     boolean exists = scrapRepository.existsByTitle(titleText);
                     if (!exists) {
