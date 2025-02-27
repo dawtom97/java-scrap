@@ -1,14 +1,19 @@
 package com.example.scrap_app.service;
 
 import com.example.scrap_app.config.SeleniumConfig;
+import com.example.scrap_app.model.ScrapModel;
+import com.example.scrap_app.repository.ScrapRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,45 +21,57 @@ import java.util.List;
 @Service
 public class ScrapService {
 
+    @Autowired
+    private ScrapRepository scrapRepository;
     private WebDriver driver;
 
     private List<WebElement> getFromOnet() {
+        driver = new SeleniumConfig().webDriver();
+        driver.get("https://www.onet.pl");
+        WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
 
-            driver = new SeleniumConfig().webDriver();
+        WebElement acceptButton = wait.until(
+                ExpectedConditions.elementToBeClickable(By.cssSelector(".cmp-button_button.cmp-intro_acceptAll"))
+        );
+        acceptButton.click();
 
-            driver.get("https://www.onet.pl");
-            WebDriverWait wait = new WebDriverWait(driver, Duration.ofSeconds(20));
+        wait.until(
+                ExpectedConditions.presenceOfElementLocated(By.cssSelector("a h3"))
+        );
 
-            WebElement acceptButton = wait.until(
-                    ExpectedConditions.elementToBeClickable(By.cssSelector(".cmp-button_button.cmp-intro_acceptAll"))
-            );
-            acceptButton.click();
+        List<WebElement> elements = wait.until(
+                ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("a:has(h3)"))
+        );
 
-            wait.until(
-                    ExpectedConditions.presenceOfElementLocated(By.cssSelector("h3"))
-            );
-
-            List<WebElement> elements = wait.until(
-                    ExpectedConditions.visibilityOfAllElementsLocatedBy(By.cssSelector("h3"))
-            );
-
-            return elements;
+        return elements;
     }
 
     public List<String> scrapByTitle(String query) {
-
         List<String> results = new ArrayList<>();
 
         try {
+            List<WebElement> elements = this.getFromOnet();
+            for (WebElement element : elements) {
+                WebElement h3Element = element.findElement(By.tagName("h3"));
+                String titleText = h3Element.getText();
+                String link = element.getAttribute("href");
 
-            List<WebElement> titles = this.getFromOnet();
-            for(WebElement title: titles) {
-                if(title.getText().toLowerCase().contains(query.toLowerCase())) {
-                    results.add(title.getText());
+                if (titleText.toLowerCase().contains(query.toLowerCase())) {
+                    results.add(titleText);
+
+                    ScrapModel model = new ScrapModel();
+                    model.setTitle(titleText);
+                    model.setSource(driver.getCurrentUrl());
+                    model.setLink(link);
+                    model.setDate(LocalDateTime.now());
+
+                    boolean exists = scrapRepository.existsByTitle(titleText);
+                    if (!exists) {
+                        scrapRepository.save(model);
+                    }
                 }
             }
-
-        } catch(Exception e) {
+        } catch (Exception e) {
             System.out.println(e.getMessage());
         } finally {
             driver.quit();
@@ -67,15 +84,18 @@ public class ScrapService {
     public List<String> scrapAll() {
         List<String> allTitles = new ArrayList<>();
         try {
+            List<WebElement> elements = this.getFromOnet();
 
-            List<WebElement> titles = this.getFromOnet();
+            for (WebElement element : elements) {
+                WebElement h3Element = element.findElement(By.tagName("h3"));
+                String titleText = h3Element.getText();
+                String link = element.getAttribute("href");
 
-            for (WebElement title: titles) {
-                allTitles.add(title.getText());
+                allTitles.add(titleText + " - " + link);
             }
         } catch (Exception e) {
             System.out.println(e.getMessage());
-        }  finally {
+        } finally {
             driver.quit();
             System.out.println("zamykam");
         }

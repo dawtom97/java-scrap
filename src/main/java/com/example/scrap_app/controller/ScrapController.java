@@ -1,5 +1,6 @@
 package com.example.scrap_app.controller;
 import com.example.scrap_app.service.ScrapService;
+import jakarta.validation.Valid;
 import org.openqa.selenium.WebElement;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,11 +29,9 @@ public class ScrapController {
     }
 
     @PostMapping("/get-by-title")
-    ResponseEntity<Map<String, Object>> getByTitle(@RequestBody Map<String,String> body) {
+    ResponseEntity<Map<String, Object>> getByTitle(@Valid @RequestBody Map<String,String> body) {
 
         String query = body.get("query");
-
-        System.out.println(query);
 
         List<String> elements = scrapService.scrapByTitle(query);
 
