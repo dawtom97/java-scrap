@@ -34,6 +34,11 @@ public class UserService {
 
     public void create(@Valid UserModel user) {
         try {
+
+            if (userRepository.emailExists(user.getEmail())) {
+                throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Email already exists!");
+            }
+
             userRepository.save(user);
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Błąd podczas zapisu użytkownika", e);
@@ -41,10 +46,6 @@ public class UserService {
     }
 
     public void delete(String id) {
-//        if(!userRepository.existsById(id)) {
-//            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Nie znaleziono użytkownika");
-//        }
-//
         userRepository.findById(id).orElseThrow(() -> new UserNotFoundException("Użytkownik z ID:" + id + " nie istnieje"));
 
         try {
