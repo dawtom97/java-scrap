@@ -4,6 +4,7 @@ import com.example.scrap_app.config.SeleniumConfig;
 import com.example.scrap_app.model.ScrapModel;
 import com.example.scrap_app.model.UserModel;
 import com.example.scrap_app.repository.ScrapRepository;
+import org.bson.types.ObjectId;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
@@ -17,6 +18,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
@@ -37,6 +39,22 @@ public class ScrapService {
             System.out.println(e.getMessage());
         }
         return data;
+    }
+
+    public String deleteNews(String id) {
+        try {
+
+            Optional<ScrapModel> object = scrapRepository.findById(id);
+            if(object.isPresent()) {
+                scrapRepository.delete(object.get());
+                return "Dokument o ID" + id + " został usunięty";
+            } else {
+                return "Dokument " + id + " nie istnieje";
+            }
+
+        } catch (Exception e) {
+            return "Błąd " + e.getMessage();
+        }
     }
 
     private List<WebElement> getFromOnet() {

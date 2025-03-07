@@ -19,7 +19,7 @@ public class ScrapController {
     ScrapService scrapService;
 
     @GetMapping("/get-all")
-    ResponseEntity<Map<String, Object>> getAll() {
+    public ResponseEntity<Map<String, Object>> getAll() {
         List<ScrapModel> data = scrapService.getAll();
 
         Map<String, Object> response = new HashMap<>();
@@ -30,7 +30,7 @@ public class ScrapController {
     }
 
     @PostMapping("/get-by-title")
-    ResponseEntity<Map<String, Object>> getByTitle(@Valid @RequestBody Map<String,String> body) {
+    public ResponseEntity<Map<String, Object>> getByTitle(@Valid @RequestBody Map<String,String> body) {
 
         String query = body.get("query");
 
@@ -40,6 +40,18 @@ public class ScrapController {
         response.put("message", "Scrap successfully");
         response.put("code","200");
         response.put("data", elements);
+
+        return ResponseEntity.ok(response);
+    }
+
+    @DeleteMapping("/delete/{id}")
+    public ResponseEntity<Map<String, Object>> deleteNews(@PathVariable String id) {
+
+        String deleted = scrapService.deleteNews(id);
+        Map<String, Object> response = new HashMap<>();
+        response.put("message", "Usunięto");
+        response.put("code","200");
+        response.put("data", deleted);
 
         return ResponseEntity.ok(response);
     }
