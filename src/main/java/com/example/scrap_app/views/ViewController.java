@@ -1,9 +1,16 @@
 package com.example.scrap_app.views;
 
 
+import com.example.scrap_app.model.ScrapModel;
+import com.example.scrap_app.service.ScrapService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.List;
 import java.util.Map;
@@ -11,10 +18,14 @@ import java.util.Map;
 @Controller
 public class ViewController {
 
+    @Autowired
+    private RestTemplate restTemplate;
+
+
+
 
     @GetMapping("/")
     public String home(Model model) {
-
 
 
         model.addAttribute("title", "Strona główna");
@@ -29,6 +40,26 @@ public class ViewController {
         model.addAttribute("products", products);
 
         return "index";
+    }
+
+    @GetMapping("/news")
+    public String news(Model model) {
+
+        String apiUrl = "http://localhost:8080/api/scrap/get-all";
+
+        ResponseEntity<Map<String,Object>> response = restTemplate.exchange(
+                apiUrl,
+                HttpMethod.GET,
+                null,
+                new ParameterizedTypeReference<Map<String, Object>>() {}
+        );
+
+        List<Map<String,Object>> scraps = (List<Map<String,Object>>) response.getBody().get("data");
+
+        model.addAttribute("scraps",scraps);
+
+
+        return "news";
     }
 
 }

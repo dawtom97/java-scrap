@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+
+      <h1>Twoje wiadomości</h1>
+
+      <div th:each="scrap : ${scraps}">
+          <img th:if="${scrap.image != null}" th:src="${scrap.image}" th:alt="${scrap.title}">
+          <h2 th:text="${scrap.title}"></h2>
+
+          <p>Źródło: <span th:text="${scrap.source}"></span></p>
+          <p>Dodano: <span th:text="${scrap.date}"></span></p>
+
+          <a th:href="${scrap.link}" target="_blank">Przejdź do posta</a>
+
+      </div>
+
+</body>
+</html>

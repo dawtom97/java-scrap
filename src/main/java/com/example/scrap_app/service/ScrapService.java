@@ -2,6 +2,7 @@ package com.example.scrap_app.service;
 
 import com.example.scrap_app.config.SeleniumConfig;
 import com.example.scrap_app.model.ScrapModel;
+import com.example.scrap_app.model.UserModel;
 import com.example.scrap_app.repository.ScrapRepository;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -24,6 +25,19 @@ public class ScrapService {
     @Autowired
     private ScrapRepository scrapRepository;
     private WebDriver driver;
+
+    public List<ScrapModel> getAll() {
+
+        List data = new ArrayList();
+
+        try {
+            data = scrapRepository.findAll();
+        }
+        catch (Exception e) {
+            System.out.println(e.getMessage());
+        }
+        return data;
+    }
 
     private List<WebElement> getFromOnet() {
         driver = new SeleniumConfig().webDriver();

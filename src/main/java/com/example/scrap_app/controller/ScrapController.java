@@ -1,4 +1,5 @@
 package com.example.scrap_app.controller;
+import com.example.scrap_app.model.ScrapModel;
 import com.example.scrap_app.service.ScrapService;
 import jakarta.validation.Valid;
 import org.openqa.selenium.WebElement;
@@ -19,12 +20,12 @@ public class ScrapController {
 
     @GetMapping("/get-all")
     ResponseEntity<Map<String, Object>> getAll() {
-        List<String> titles = scrapService.scrapAll();
+        List<ScrapModel> data = scrapService.getAll();
 
         Map<String, Object> response = new HashMap<>();
         response.put("message", "Scrap successfully");
         response.put("code","200");
-        response.put("data", titles);
+        response.put("data", data);
         return ResponseEntity.ok(response);
     }
 
