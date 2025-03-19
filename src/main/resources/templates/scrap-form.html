@@ -6,24 +6,31 @@
 </head>
 <body>
 
-  <h2>Add news</h2>
+    <h2>Wyszukiwarka</h2>
 
-  <form id="newsForm">
-    <label for="query">Wprowadź poszukiwaną treść</label>
-    <input type="text" id="query" name="query" required>
+    <form onsubmit="sendQuery(event)">
+        <label for="Query">Wprowadź tytuł</label>
+        <input type="text" name="query" id="Query">
+        <button type="submit" id="SearchBtn">Szukaj</button>
 
-    <button type="submit">Szukaj</button>
-  </form>
+    </form>
 
-  <p id="loading" style="display:none;">Pobieranie danych.....</p>
+    <p id="Loader" style="display:none;">Pobieranie danych.....</p>
 
-  <h3>Wynik:</h3>
-  <pre id="result">
+    <h4>Wynik</h4>
+    <pre id="Results">
 
-  </pre>
-
+    </pre>
 
 
-   <script src="/js/sendQuery.js"></script>
+
+
+    <form method="post" th:action="@{/scrap-operation}">
+        <input type="text" name="query" placeholder="Tytul">
+        <button type="submit">Szukaj</button>
+    </form>
+
+
+    <script src="/js/sendQuery.js"></script>
 </body>
 </html>

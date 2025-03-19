@@ -28,6 +28,7 @@ public class ScrapService {
     private ScrapRepository scrapRepository;
     private WebDriver driver;
 
+
     public List<ScrapModel> getAll() {
 
         List data = new ArrayList();

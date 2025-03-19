@@ -18,7 +18,7 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String,String>> handleUserNotFoundException(UserNotFoundException ex) {
         Map<String,String> response = new HashMap<>();
 
-        response.put("message", "Użytkownik o podanym ID nie istnieje");
+        response.put("message", ex.getMessage());
         response.put("error", "User not found");
         response.put("code", "404");
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(response);

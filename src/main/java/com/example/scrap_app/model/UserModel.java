@@ -16,7 +16,10 @@ public class UserModel {
     @Id
     private String id;
     @NotBlank(message = "Name cannot be empty")
-    private String name;
+    private String username;
     @NotBlank(message = "Email cannot be empty")
     private String email;
+
+    @NotBlank(message = "Password cannot be empty")
+    private String password;
 }

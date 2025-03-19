@@ -12,7 +12,7 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/api/**")  // Zezwól na żądania dla ścieżek zaczynających się od /api/
+                registry.addMapping("/**")  // Zezwól na żądania dla ścieżek zaczynających się od /api/
                         .allowedOrigins("http://127.0.0.1:5500") // Domena, z której zezwalamy na żądania
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Dozwolone metody
                         .allowedHeaders("*") // Dozwolone nagłówki
