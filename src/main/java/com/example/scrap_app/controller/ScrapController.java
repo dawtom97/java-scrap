@@ -37,7 +37,8 @@ public class ScrapController {
         List<String> elements = scrapService.scrapByTitle(query);
 
         Map<String, Object> response = new HashMap<>();
-        response.put("message", "Scrap successfully");
+        response.put("message", "Pobrano " + elements.size() + " wiadomości");
+        response.put("status", "success");
         response.put("code","200");
         response.put("data", elements);
 

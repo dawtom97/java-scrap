@@ -12,8 +12,8 @@ public class CorsConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/**")  // Zezwól na żądania dla ścieżek zaczynających się od /api/
-                        .allowedOrigins("http://127.0.0.1:5500") // Domena, z której zezwalamy na żądania
+                registry.addMapping("/**")
+                        .allowedOrigins("http://localhost:5173","https://scrap-java-react-front-sigma.vercel.app") // Domena, z której zezwalamy na żądania
                         .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS") // Dozwolone metody
                         .allowedHeaders("*") // Dozwolone nagłówki
                         .allowCredentials(true); // Zezwalaj na ciasteczka/autoryzację

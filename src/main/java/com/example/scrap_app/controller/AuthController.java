@@ -5,12 +5,9 @@ import com.example.scrap_app.filter.JwtUtil;
 import com.example.scrap_app.model.UserModel;
 import com.example.scrap_app.repository.AuthRepository;
 import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
-import io.jsonwebtoken.security.Keys;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
-import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
@@ -19,11 +16,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/auth")
+@RequestMapping("/api/auth")
 public class AuthController {
     private final AuthenticationManager authenticationManager;
     private final AuthRepository authRepository;
@@ -35,27 +33,39 @@ public class AuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<String> register(@Valid @RequestBody UserModel user) {
+    public ResponseEntity<Map<String, Object>> register(@Valid @RequestBody UserModel user) {
         String username = user.getUsername();
+        Map<String, Object> response = new HashMap<>();
 
         if (authRepository.findByUsername(username).isPresent()) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User already exists");
+            response.put("message", "Użytkownik o podanej nazwie już istnieje");
+            response.put("code", "400");
+            response.put("status", "error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
         }
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 
         authRepository.save(user);
-        return ResponseEntity.ok("User registered");
+
+        response.put("message", "Konto zostało założone");
+        response.put("code","201");
+        response.put("status","success");
+        return ResponseEntity.ok(response);
     }
 
     @PostMapping("/login")
-    public ResponseEntity<Map<String, String>> login(@RequestBody Map<String, String> user, HttpServletResponse response) {
+    public ResponseEntity<Map<String, Object>> login(@RequestBody Map<String, String> user, HttpServletResponse response) {
         String username = user.get("username");
         String password = user.get("password");
+        Map<String, Object> resMap = new HashMap<>();
 
         Optional<UserModel> userData = authRepository.findByUsername(username);
         if (userData.isEmpty() || !passwordEncoder.matches(password, userData.get().getPassword())) {
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(Map.of("error", "Invalid credentials"));
+            resMap.put("message", "Błędny email lub hasło");
+            resMap.put("code", "400");
+            resMap.put("status", "error");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(resMap);
         }
 
         String token = Jwts.builder()
@@ -66,14 +76,21 @@ public class AuthController {
                 .compact();
 
         ResponseCookie cookie = ResponseCookie.from("jwt",token)
+                .httpOnly(true)
                 .secure(true)
-                .sameSite("None")
-                .maxAge(3600)
+                .path("/")
+                .sameSite("Lax")
+                .partitioned(true) // Ustawienie Partitioned
+                .maxAge(3600) // 1 godzina
                 .build();
 
         response.addHeader("Set-Cookie", cookie.toString());
+        resMap.put("message", "Pomyślnie zalogowano");
+        resMap.put("code", "200");
+        resMap.put("status", "success");
+        resMap.put("token", token);
 
-        return ResponseEntity.ok(Map.of("token", token));
+        return ResponseEntity.ok(resMap);
     }
 
 

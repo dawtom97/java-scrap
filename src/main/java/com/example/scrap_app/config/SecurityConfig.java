@@ -7,6 +7,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,12 +26,15 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorizeRequests ->
                         authorizeRequests
-                                .requestMatchers("/auth/**").permitAll() // Zezwól na logowanie i rejestrację
+                                .requestMatchers("/api/auth/**").permitAll() // Zezwól na logowanie i rejestrację
                                 .requestMatchers("/api/scrap/**").authenticated() // Zabezpiecz scrap
                                 .anyRequest().authenticated() // Wszystkie inne żądania wymagają autoryzacji
                 )
-                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class); // Dodaj filtr JWT
-
+                .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class) // Dodaj filtr JWT
+                .sessionManagement(session ->
+                        session
+                              .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+        );
         return http.build();
     }
 
